@@ -6,6 +6,7 @@ from django.contrib import messages
 
 # Create your views here.
 
+
 def index(request):
 
     num_jobs = Job.objects.all().count()
@@ -14,26 +15,31 @@ def index(request):
     num_input_imgs = ImgInput.objects.all().count()
 
     context = {
-            "num_jobs": num_jobs,
-            "num_jobs_pending": num_jobs_pending,
-            "num_jobs_done": num_jobs_done,
-            "num_input_imgs": num_input_imgs,
+        "num_jobs": num_jobs,
+        "num_jobs_pending": num_jobs_pending,
+        "num_jobs_done": num_jobs_done,
+        "num_input_imgs": num_input_imgs,
     }
 
     return render(request, "index.html", context=context)
 
+
 class JobListView(generic.ListView):
     model = Job
 
+
 class ImgInputListView(generic.ListView):
     model = ImgInput
+
 
 def display_input_images(request):
     all_images = ImgInput.objects.all()
     return render(request, "catalog/imginput_list.html", {"images": all_images})
 
+
 class ImgOutputListView(generic.ListView):
     model = ImgOutput
+
 
 def newjob(request):
     if request.method == "POST":
@@ -45,11 +51,10 @@ def newjob(request):
     else:
         form = JobForm()
 
-    context = {
-            "form": form
-    }
+    context = {"form": form}
 
     return render(request, "catalog/new.html", context)
+
 
 def newimginput(request):
     if request.method == "POST":
@@ -61,8 +66,6 @@ def newimginput(request):
     else:
         form = ImgInputForm()
 
-    context = {
-            "form": form
-    }
+    context = {"form": form}
 
     return render(request, "catalog/new.html", context)
