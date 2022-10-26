@@ -1,0 +1,32 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Job List</h1>
+  {% if job_list %}
+  <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Time</th>
+              <th>Input image</th>
+              <th>Prompt</th>
+              <th>Strength</th>
+              <th>Output image</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for job in job_list %}
+        <tr>
+            <td><a href="{{ job.get_absolute_url }}">{{ job.time }}</a></td>
+            <td><img src="{{job.input_img.image.url}}" width="120"/></td>
+            <td>{{job.prompt}}</td>
+            <td>{{job.strength}}</td>
+            <td><img src="{{job.output_img.image.url}}" width="120"/></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+  {% else %}
+    <p>There are no jobs.</p>
+  {% endif %}
+{% endblock %}
+

@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Output images</h1>
+  {% if imgoutput_list %}
+  <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Name</th>
+              <th>Image</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for img in imgoutput_list %}
+        <tr>
+            <td><a href="{{ img.get_absolute_url }}">{{ img.name }}</a></td>
+            <td><img src="{{ img.image.url }}" width="120"/></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+  {% else %}
+    <p>There are no outputs.</p>
+  {% endif %}
+{% endblock %}
+

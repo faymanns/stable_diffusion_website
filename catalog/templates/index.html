@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Stable diffusion img2img website</h1>
+  <p>Stable diffusion img2img website</p>
+  <h2>Dynamic content</h2>
+  <p>Job statistics</p>
+  <ul>
+    <li><strong>Total number of jobs:</strong> {{ num_jobs }}</li>
+    <li><strong>Number of jobs pending:</strong> {{ num_jobs_pending }}</li>
+    <li><strong>Number of completed jobs:</strong> {{ num_jobs_done }}</li>
+    <li><strong>Number of input images:</strong> {{ num_input_imgs }}</li>
+  </ul>
+{% endblock %}

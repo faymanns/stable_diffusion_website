@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Input images</h1>
+  {% if images %}
+  <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Name</th>
+              <th>Image</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for img in images %}
+        <tr>
+            <td><a href="{{ img.get_absolute_url }}">{{ img.name }}</a></td>
+            <td><img src="{{ img.image.url }}" width="120"/></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+  {% else %}
+    <p>There are no inputs.</p>
+  {% endif %}
+{% endblock %}
