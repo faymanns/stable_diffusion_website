@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -44,5 +45,11 @@ class Job(models.Model):
         help_text="Status of the job",
     )
 
+    class Meta:
+        ordering = ("-time",)
+
     def __str__(self):
         return f"{self.time}\t{status}\t{prompt}\t{strength}"
+
+    def get_absolute_url(self):
+        return reverse("job_detail", args=[str(self.id)])

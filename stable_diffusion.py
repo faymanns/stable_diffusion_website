@@ -1,22 +1,24 @@
+import os.path
 import pathlib
 import sqlite3
 import subprocess
 import time
 
-SD_PYTHON = "/home/aymanns/anaconda3/envs/ldm/bin/python"
+SD_PYTHON = "/home/aymanns/miniconda3/envs/ldm/bin/python"
 SD_CONFIG = "/home/aymanns/stable-diffusion/configs/stable-diffusion/v1-inference.yaml"
 SD_CKPT = "/home/aymanns/stable-diffusion/models/ldm/stable-diffusion-v1/model.ckpt"
 IMG2IMG = "/home/aymanns/stable-diffusion/scripts/img2img.py"
-MEDIA_DIR = pathlib.Path(
-    "/home/aymanns/projects/Art_Dorota_Egle/stable_diffusion_website/media"
-)
+MEDIA_DIR = pathlib.Path("/home/aymanns/stable_diffusion_website/media")
+OUTDIR = MEDIA_DIR / "output"
 JOB_TABLE = "catalog_job"
 INPUT_TABLE = "catalog_imginput"
 OUTPUT_TABLE = "catalog_imgoutput"
 
 
-def laod_most_recent(directory):
-    pass
+def get_most_recent(directory):
+    all_files = list(directory.glob("*"))
+    most_recent_file = max(all_files, key=os.path.getctime)
+    return "output/" + most_recent_file.name
 
 
 def run(img, prompt, strength, seed=42):
@@ -35,23 +37,19 @@ def run(img, prompt, strength, seed=42):
         "--seed",
         str(seed),
         "--outdir",
-        MEDIA_DIR / "output",
+        OUTDIR,
         "--config",
         SD_CONFIG,
         "--ckpt",
         SD_CKPT,
     ]
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    print(error)
-    quit()
+    output = process.communicate()
 
-    if len(error) == 0:
-        img = load_most_recent(TMP_DIR)
-        return "output/TEST3.jpg"
+    if process.returncode == 0:
+        img = get_most_recent(OUTDIR)
+        return img
     else:
-        print(error)
-        quit()
         return None
 
 
@@ -84,15 +82,17 @@ if __name__ == "__main__":
     # print("#############")
     # print()
 
-    cur.execute(f"SELECT * FROM {JOB_TABLE} WHERE status='p' ORDER BY time;")
-    pending_rows = cur.fetchall()
-
     while True:
-        for row in pending_rows:
-            _, time, strength, prompt, status, input_img_id, _ = row
+        cur.execute(
+            f"SELECT time, strength, prompt, status, input_img_id FROM {JOB_TABLE} WHERE status='p' ORDER BY time;"
+        )
+        pending_rows = cur.fetchall()
 
-            cur.execute(f"SELECT * from {INPUT_TABLE} WHERE id={input_img_id}")
-            _, _, img = cur.fetchone()
+        for row in pending_rows:
+            job_time, strength, prompt, status, input_img_id = row
+
+            cur.execute(f"SELECT image from {INPUT_TABLE} WHERE id={input_img_id}")
+            (img,) = cur.fetchone()
 
             output_image_path = run(img, prompt, strength)
 
@@ -102,12 +102,12 @@ if __name__ == "__main__":
             con.commit()
 
             cur.execute(
-                f"SELECT * FROM {OUTPUT_TABLE} WHERE image='{output_image_path}'"
+                f"SELECT id, image FROM {OUTPUT_TABLE} WHERE image='{output_image_path}'"
             )
             output_img_id, path = cur.fetchone()
 
             cur.execute(
-                f"UPDATE {JOB_TABLE} SET status = 'd', output_img_id = {output_img_id} WHERE time='{time}'"
+                f"UPDATE {JOB_TABLE} SET status = 'd', output_img_id = {output_img_id} WHERE time='{job_time}'"
             )
             con.commit()
         time.sleep(1)

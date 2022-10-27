@@ -20,11 +20,27 @@
           <li><a href="{% url 'add_job' %}">Add job</a></li>
           <li><a href="{% url 'add_input_img' %}">Add input image</a></li>
           <li><a href="{% url 'inputs' %}">All input images</a></li>
-          <li><a href="{% url 'outputs' %}">All output images</a></li>
         </ul>
      {% endblock %}
       </div>
       <div class="col-sm-10 ">{% block content %}{% endblock %}</div>
+      {% block pagination %}
+    	{% if is_paginated %}
+    	    <div class="pagination">
+    	        <span class="page-links">
+    	            {% if page_obj.has_previous %}
+    	                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+    	            {% endif %}
+    	            <span class="page-current">
+    	                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    	            </span>
+    	            {% if page_obj.has_next %}
+    	                <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+    	            {% endif %}
+    	        </span>
+    	    </div>
+    	{% endif %}
+  	  {% endblock %} 
     </div>
   </div>
 </body>
